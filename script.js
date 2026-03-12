@@ -1,6 +1,8 @@
+// ===== ТАЙМЕР + СНЕГ + КОНФЕТТИ + АНИМАЦИИ =====
 let timerInterval = null;
 let targetTime = null;
 
+// ===== DOM ЭЛЕМЕНТЫ =====
 const timerBox = document.getElementById("timerBox");
 const noTimer = document.getElementById("noTimer");
 const daysEl = document.getElementById("days");
@@ -9,9 +11,10 @@ const minutesEl = document.getElementById("minutes");
 const secondsEl = document.getElementById("seconds");
 const refreshBtn = document.getElementById("refreshBtn");
 
-// СНЕГ
+// ===== СНЕГ =====
 const canvas = document.getElementById('snowCanvas');
 const ctx = canvas.getContext('2d');
+
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 
@@ -22,12 +25,14 @@ window.addEventListener('resize', () => {
 
 const snowflakes = [];
 const maxFlakes = 100;
+
 for (let i = 0; i < maxFlakes; i++) {
     snowflakes.push({
         x: Math.random() * width,
         y: Math.random() * height,
         r: Math.random() * 3 + 1,
-        speed: Math.random() * 1 + 0.5
+        speed: Math.random() * 1 + 0.5,
+        opacity: Math.random() * 0.5 + 0.3
     });
 }
 
@@ -35,10 +40,12 @@ function drawSnow() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "rgba(255,255,255,0.3)";
     ctx.beginPath();
+
     for (let f of snowflakes) {
         ctx.moveTo(f.x, f.y);
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
     }
+
     ctx.fill();
     updateSnow();
 }
@@ -47,16 +54,18 @@ function updateSnow() {
     for (let f of snowflakes) {
         f.y += f.speed;
         f.x += Math.sin(f.y / height * Math.PI * 2) * 0.5;
+
         if (f.y > height) f.y = 0;
         if (f.x > width) f.x = 0;
         if (f.x < 0) f.x = width;
     }
+
     requestAnimationFrame(drawSnow);
 }
 
 drawSnow();
 
-// ===== ЗАГРУЗКА ДАТЫ =====
+// ===== ЗАГРУЗКА ДАТЫ И ТАЙМЕР =====
 async function loadTargetDate() {
     try {
         const url = "https://raw.githubusercontent.com/toolgool2021-coder/Time/main/date.json?nocache=" + Date.now();
@@ -70,10 +79,9 @@ async function loadTargetDate() {
     }
 }
 
-// ===== ТАЙМЕР =====
 function startCountdown() {
     updateDisplay();
-    clearInterval(timerInterval);
+    if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateDisplay, 1000);
 }
 
@@ -94,7 +102,7 @@ function updateDisplay() {
         timerBox.style.display = "none";
         noTimer.style.display = "block";
 
-        launchConfetti(3000); // конфетти 3 сек
+        launchConfetti(3000); // Конфетти на 3 секунды
         return;
     }
 
@@ -109,13 +117,25 @@ function updateDisplay() {
     minutesEl.textContent = String(minutes).padStart(2,"0");
     secondsEl.textContent = String(seconds).padStart(2,"0");
 
+    showTimer();
+}
+
+// ===== КНОПКА ОБНОВИТЬ =====
+refreshBtn.addEventListener("click", () => {
+    updateDisplay();
+    animateButton();
+});
+
+// ===== ПОКАЗАТЬ / СКРЫТЬ ТАЙМЕР =====
+function showTimer() {
     timerBox.style.display = "block";
     noTimer.style.display = "none";
 }
 
-refreshBtn.addEventListener("click", () => {
-    updateDisplay();
-});
+function showNoTimer() {
+    timerBox.style.display = "none";
+    noTimer.style.display = "block";
+}
 
 // ===== КОНФЕТТИ =====
 function launchConfetti(duration = 3000) {
@@ -140,14 +160,13 @@ function launchConfetti(duration = 3000) {
     })();
 }
 
-function showNoTimer() {
-    timerBox.style.display = "none";
-    noTimer.style.display = "block";
+// ===== АНИМАЦИИ =====
+function animateButton() {
+    refreshBtn.style.opacity = '0.7';
+    setTimeout(() => refreshBtn.style.opacity = '1', 300);
 }
 
-window.addEventListener("load", loadTargetDate);
-
-// ===== Анимация таймера =====
+// ===== АНИМАЦИЯ ТАЙМЕРА =====
 const style = document.createElement('style');
 style.textContent = `
 @keyframes pulse {
@@ -161,3 +180,6 @@ style.textContent = `
     }
 }`;
 document.head.appendChild(style);
+
+// ===== ЗАГРУЗКА ПРИ ОТКРЫТИИ СТРАНИЦЫ =====
+window.addEventListener("load", loadTargetDate);
