@@ -1,13 +1,9 @@
-// ===== НАСТРОЙКА ТАЙМЕРА =====
-const TIMER = {
-    days: 0,
-    hours: 1,
-    minutes: 30,
-    seconds: 0
-};
+// ===== ЦЕЛЕВОЕ ВРЕМЯ =====
+// Указываем конкретный момент, до которого идёт таймер
+// Формат: "ГГГГ-ММ-ДД ЧЧ:ММ:СС"
+const TARGET_DATE = "2026-03-20 18:00:00"; 
 
 let timerInterval = null;
-let targetTime = null;
 
 // ===== DOM ЭЛЕМЕНТЫ =====
 const timerBox = document.getElementById('timerBox');
@@ -72,79 +68,35 @@ function updateSnow() {
 drawSnow();
 
 // ===== ТАЙМЕР =====
-
-window.addEventListener('load', startTimer);
-
+window.addEventListener('load', startCountdown);
 refreshBtn.addEventListener('click', () => {
-    startTimer();
-    animateButton();
+    updateDisplay(); // просто обновляем цифры
 });
 
-function startTimer() {
-
-    const totalSeconds =
-        TIMER.days * 86400 +
-        TIMER.hours * 3600 +
-        TIMER.minutes * 60 +
-        TIMER.seconds;
-
-    if (totalSeconds === 0) {
-        showNoTimer();
-        return;
-    }
-
-    targetTime = Date.now() + totalSeconds * 1000;
-
-    showTimer();
-    startCountdown();
-}
-
-function showTimer() {
-    timerBox.style.display = 'block';
-    noTimer.style.display = 'none';
-}
-
-function showNoTimer() {
-    timerBox.style.display = 'none';
-    noTimer.style.display = 'block';
-    stopCountdown();
-}
-
+// Основная функция отсчёта
 function startCountdown() {
-    if (timerInterval) clearInterval(timerInterval);
-
-    updateDisplay();
+    updateDisplay(); // обновляем сразу
     timerInterval = setInterval(updateDisplay, 1000);
 }
 
-function stopCountdown() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-}
-
 function updateDisplay() {
+    const now = new Date();
+    const target = new Date(TARGET_DATE);
 
-    if (!targetTime) return;
-
-    const now = Date.now();
-    const diff = targetTime - now;
+    let diff = target - now; // разница в миллисекундах
 
     if (diff <= 0) {
-
-        daysEl.textContent = '00';
-        hoursEl.textContent = '00';
-        minutesEl.textContent = '00';
-        secondsEl.textContent = '00';
-
-        stopCountdown();
-        playFinishAnimation();
+        daysEl.textContent = "00";
+        hoursEl.textContent = "00";
+        minutesEl.textContent = "00";
+        secondsEl.textContent = "00";
+        timerBox.style.display = 'none';
+        noTimer.style.display = 'block';
+        clearInterval(timerInterval);
         return;
     }
 
     const totalSeconds = Math.floor(diff / 1000);
-
     const days = Math.floor(totalSeconds / 86400);
     const hours = Math.floor((totalSeconds % 86400) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -154,29 +106,13 @@ function updateDisplay() {
     hoursEl.textContent = String(hours).padStart(2, '0');
     minutesEl.textContent = String(minutes).padStart(2, '0');
     secondsEl.textContent = String(seconds).padStart(2, '0');
-}
 
-function playFinishAnimation() {
-
-    timerBox.style.animation = 'none';
-
-    setTimeout(() => {
-        timerBox.style.animation = 'pulse 0.5s ease-in-out 3';
-    }, 10);
-}
-
-function animateButton() {
-
-    refreshBtn.style.opacity = '0.7';
-
-    setTimeout(() => {
-        refreshBtn.style.opacity = '1';
-    }, 300);
+    timerBox.style.display = 'block';
+    noTimer.style.display = 'none';
 }
 
 // ===== CSS АНИМАЦИЯ =====
 const style = document.createElement('style');
-
 style.textContent = `
 @keyframes pulse {
     0%,100%{
@@ -187,8 +123,5 @@ style.textContent = `
         transform:scale(1.05);
         box-shadow:0 0 60px rgba(0,255,255,0.6);
     }
-}
-`;
-
+}`;
 document.head.appendChild(style);
-        
