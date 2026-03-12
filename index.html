@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Таймер - Toolgool</title>
+
+    <!-- Метатеги для отключения кэша -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <link rel="stylesheet" href="style.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -51,7 +57,6 @@
                 <i class="fas fa-sync-alt"></i> Обновить
             </button>
         </div>
-
     </div>
 </div>
 
@@ -63,6 +68,10 @@
     </div>
 </footer>
 
-<script src="script.js?v=2"></script>
+<!-- Конфетти -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<!-- Таймер -->
+<script src="script.js?nocache=<?=Date.now()?>"></script>
 </body>
-</html>
+                        </html>
