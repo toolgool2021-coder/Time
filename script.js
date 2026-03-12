@@ -1,11 +1,7 @@
-// ===== ЦЕЛЕВОЕ ВРЕМЯ =====
-// Указываем конкретный момент, до которого идёт таймер
-// Формат: "ГГГГ-ММ-ДД ЧЧ:ММ:СС"
-const TARGET_DATE = "2026-03-12 18:49:00"; 
-
 let timerInterval = null;
+let targetTime = null;
 
-// ===== DOM ЭЛЕМЕНТЫ =====
+// DOM элементы
 const timerBox = document.getElementById('timerBox');
 const noTimer = document.getElementById('noTimer');
 const daysEl = document.getElementById('days');
@@ -14,10 +10,9 @@ const minutesEl = document.getElementById('minutes');
 const secondsEl = document.getElementById('seconds');
 const refreshBtn = document.getElementById('refreshBtn');
 
-// ===== СНЕГ =====
+// СНЕГ
 const canvas = document.getElementById('snowCanvas');
 const ctx = canvas.getContext('2d');
-
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 
@@ -28,7 +23,6 @@ window.addEventListener('resize', () => {
 
 const snowflakes = [];
 const maxFlakes = 100;
-
 for (let i = 0; i < maxFlakes; i++) {
     snowflakes.push({
         x: Math.random() * width,
@@ -42,12 +36,10 @@ function drawSnow() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "rgba(255,255,255,0.3)";
     ctx.beginPath();
-
     for (let f of snowflakes) {
         ctx.moveTo(f.x, f.y);
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
     }
-
     ctx.fill();
     updateSnow();
 }
@@ -56,34 +48,40 @@ function updateSnow() {
     for (let f of snowflakes) {
         f.y += f.speed;
         f.x += Math.sin(f.y / height * Math.PI * 2) * 0.5;
-
         if (f.y > height) f.y = 0;
         if (f.x > width) f.x = 0;
         if (f.x < 0) f.x = width;
     }
-
     requestAnimationFrame(drawSnow);
 }
 
 drawSnow();
 
-// ===== ТАЙМЕР =====
-window.addEventListener('load', startCountdown);
-refreshBtn.addEventListener('click', () => {
-    updateDisplay(); // просто обновляем цифры
-});
+// Загрузка даты из JSON с отключением кэша
+async function loadTargetDate() {
+    try {
+        const res = await fetch('date.json?nocache=' + Date.now());
+        const data = await res.json();
+        targetTime = new Date(data.target).getTime();
+        startCountdown();
+    } catch (e) {
+        console.error("Ошибка загрузки даты:", e);
+        showNoTimer();
+    }
+}
 
-// Основная функция отсчёта
+// Запуск таймера
 function startCountdown() {
-    updateDisplay(); // обновляем сразу
+    updateDisplay();
+    if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateDisplay, 1000);
 }
 
+// Обновление цифр таймера
 function updateDisplay() {
-    const now = new Date();
-    const target = new Date(TARGET_DATE);
-
-    let diff = target - now; // разница в миллисекундах
+    if (!targetTime) return;
+    const now = Date.now();
+    let diff = targetTime - now;
 
     if (diff <= 0) {
         daysEl.textContent = "00";
@@ -111,7 +109,15 @@ function updateDisplay() {
     noTimer.style.display = 'none';
 }
 
-// ===== CSS АНИМАЦИЯ =====
+// Кнопка обновить
+refreshBtn.addEventListener('click', () => {
+    updateDisplay(); // просто обновляем цифры
+});
+
+// При загрузке страницы
+window.addEventListener('load', loadTargetDate);
+
+// CSS анимация
 const style = document.createElement('style');
 style.textContent = `
 @keyframes pulse {
