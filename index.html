@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таймер - Toolgool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="snowCanvas"></canvas>
+
+<div class="container">
+    <div class="timer-section">
+        
+        <!-- Заголовок -->
+        <div class="header">
+            <h1 class="title">⏱️ ТАЙМЕР</h1>
+            <p class="subtitle">@Toolgool</p>
+        </div>
+
+        <!-- Основной таймер -->
+        <div class="timer-box" id="timerBox">
+            <div class="timer-display">
+                <div class="time-unit">
+                    <span class="time-value" id="days">00</span>
+                    <span class="time-label">ДНИ</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-unit">
+                    <span class="time-value" id="hours">00</span>
+                    <span class="time-label">ЧАСЫ</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-unit">
+                    <span class="time-value" id="minutes">00</span>
+                    <span class="time-label">МИН</span>
+                </div>
+                <span class="separator">:</span>
+                <div class="time-unit">
+                    <span class="time-value" id="seconds">00</span>
+                    <span class="time-label">СЕК</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение об отсутствии таймеров -->
+        <div class="no-timer" id="noTimer">
+            <p>💤 Нету таймеров 💤</p>
+        </div>
+
+        <!-- Кнопка обновления -->
+        <div class="controls">
+            <button id="refreshBtn" class="btn btn-refresh">
+                <i class="fas fa-sync-alt"></i> Обновить
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="footer-container">
+        <!-- Социальные сети -->
+        <div class="social-links-footer">
+            <a href="https://t.me/Toolgool" class="social-link-footer" title="Telegram" target="_blank">
+                <i class="fab fa-telegram"></i>
+            </a>
+            <a href="https://www.tiktok.com/@Toolgool2023" class="social-link-footer" title="TikTok" target="_blank">
+                <i class="fab fa-tiktok"></i>
+            </a>
+            <a href="https://www.instagram.com/Toolgool2023" class="social-link-footer" title="Instagram" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.youtube.com/@Toolgool2023" class="social-link-footer" title="YouTube" target="_blank">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://vk.com/Toolgool" class="social-link-footer" title="VK" target="_blank">
+                <i class="fab fa-vk"></i>
+            </a>
+            <a href="https://discord.com/users/Toolgool2023" class="social-link-footer" title="Discord" target="_blank">
+                <i class="fab fa-discord"></i>
+            </a>
+            <a href="https://www.twitch.tv/Toolgool2023" class="social-link-footer" title="Twitch" target="_blank">
+                <i class="fab fa-twitch"></i>
+            </a>
+            <a href="https://x.com/Toolgool2023" class="social-link-footer" title="X" target="_blank">
+                <i class="fab fa-x-twitter"></i>
+            </a>
+            <a href="https://www.facebook.com/Toolgool2023" class="social-link-footer" title="Facebook" target="_blank">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://github.com/Toolgool" class="social-link-footer" title="GitHub" target="_blank">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+
+        <!-- Footer текст -->
+        <div class="footer-text">
+            <p>&copy; 2024-2026 Toolgool. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+              </html>
