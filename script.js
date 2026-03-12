@@ -1,6 +1,7 @@
-// ===== ТАЙМЕР + СНЕГ + КОНФЕТТИ + АНИМАЦИИ =====
+// ===== ПОЛНЫЙ СКРИПТ: ТАЙМЕР + СНЕГ + КОНФЕТТИ + АНИМАЦИИ =====
 let timerInterval = null;
 let targetTime = null;
+let confettiLaunched = false; // флаг, чтобы конфетти не стреляло бесконечно
 
 // ===== DOM ЭЛЕМЕНТЫ =====
 const timerBox = document.getElementById("timerBox");
@@ -25,7 +26,6 @@ window.addEventListener('resize', () => {
 
 const snowflakes = [];
 const maxFlakes = 100;
-
 for (let i = 0; i < maxFlakes; i++) {
     snowflakes.push({
         x: Math.random() * width,
@@ -71,7 +71,7 @@ async function loadTargetDate() {
         const url = "https://raw.githubusercontent.com/toolgool2021-coder/Time/main/date.json?nocache=" + Date.now();
         const res = await fetch(url);
         const data = await res.json();
-        targetTime = new Date(data.target).getTime();
+        targetTime = new Date(data.target).getTime(); // фиксированное время из JSON
         startCountdown();
     } catch (e) {
         console.error("Ошибка загрузки даты:", e);
@@ -79,6 +79,7 @@ async function loadTargetDate() {
     }
 }
 
+// ===== ТАЙМЕР =====
 function startCountdown() {
     updateDisplay();
     if (timerInterval) clearInterval(timerInterval);
@@ -98,11 +99,15 @@ function updateDisplay() {
         secondsEl.textContent = "00";
 
         clearInterval(timerInterval);
-
         timerBox.style.display = "none";
         noTimer.style.display = "block";
 
-        launchConfetti(3000); // Конфетти на 3 секунды
+        // Конфетти один раз
+        if (!confettiLaunched) {
+            confettiLaunched = true;
+            launchConfettiBurst();
+        }
+
         return;
     }
 
@@ -138,26 +143,18 @@ function showNoTimer() {
 }
 
 // ===== КОНФЕТТИ =====
-function launchConfetti(duration = 3000) {
-    const end = Date.now() + duration;
-
-    (function frame() {
+function launchConfettiBurst() {
+    // Сразу несколько “рывков”
+    for (let i = 0; i < 3; i++) {
         confetti({
-            particleCount: 7,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 }
+            particleCount: 30,
+            spread: 100,
+            origin: { x: Math.random(), y: Math.random() * 0.5 },
+            colors: ['#ff0a54', '#ff477e', '#ff7096', '#ff85a1', '#fbb1b1']
         });
-        confetti({
-            particleCount: 7,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 }
-        });
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
-        }
-    })();
+    }
+    // Пульс таймера
+    timerBox.style.animation = 'pulse 0.5s ease-in-out 3';
 }
 
 // ===== АНИМАЦИИ =====
