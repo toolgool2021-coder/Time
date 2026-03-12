@@ -1,7 +1,10 @@
-// ===== КОНФИГУРАЦИЯ =====
-// Используем CORS прокси для доступа к Gist'у
-const GIST_URL = 'https://gist.githubusercontent.com/toolgool2021-coder/ccec7ab757f8ca35a783465f9c31eb66/raw/4aeb74103442ee044755ff3add663587efb5e5cf/Time.txt';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// ===== НАСТРОЙКА ТАЙМЕРА =====
+const TIMER = {
+    days: 0,
+    hours: 1,
+    minutes: 30,
+    seconds: 0
+};
 
 let timerInterval = null;
 let targetTime = null;
@@ -35,8 +38,7 @@ for (let i = 0; i < maxFlakes; i++) {
         x: Math.random() * width,
         y: Math.random() * height,
         r: Math.random() * 3 + 1,
-        speed: Math.random() * 1 + 0.5,
-        opacity: Math.random() * 0.5 + 0.3
+        speed: Math.random() * 1 + 0.5
     });
 }
 
@@ -71,69 +73,30 @@ drawSnow();
 
 // ===== ТАЙМЕР =====
 
-// Обработчик кнопки обновления
+window.addEventListener('load', startTimer);
+
 refreshBtn.addEventListener('click', () => {
-    loadTimer();
+    startTimer();
     animateButton();
 });
 
-// Загрузить таймер при загрузке страницы
-window.addEventListener('load', loadTimer);
+function startTimer() {
 
-// Автоматическое обновление каждые 5 секунд
-setInterval(loadTimer, 5000);
+    const totalSeconds =
+        TIMER.days * 86400 +
+        TIMER.hours * 3600 +
+        TIMER.minutes * 60 +
+        TIMER.seconds;
 
-async function loadTimer() {
-    try {
-        console.log('🔄 Загружаю таймер...');
-        
-        // Используем CORS прокси
-        const proxyUrl = CORS_PROXY + encodeURIComponent(GIST_URL);
-        
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const text = await response.text();
-        console.log('📄 Содержимое Gist:', text);
-
-        // Парсим формат [Day:Hour:Min:Sec]
-        const match = text.match(/\[(\d+):(\d+):(\d+):(\d+)\]/);
-        
-        if (!match || !text) {
-            console.log('❌ Таймер не найден');
-            showNoTimer();
-            return;
-        }
-
-        const days = parseInt(match[1]);
-        const hours = parseInt(match[2]);
-        const minutes = parseInt(match[3]);
-        const seconds = parseInt(match[4]);
-
-        console.log(`✅ Найден таймер: ${days}д ${hours}ч ${minutes}м ${seconds}с`);
-
-        // Проверяем, есть ли вообще время
-        if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
-            console.log('⏸️  Время = 0, показываю "нету таймеров"');
-            showNoTimer();
-            return;
-        }
-
-        // Вычисляем целевое время
-        const totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds;
-        targetTime = Date.now() + totalSeconds * 1000;
-
-        console.log(`⏱️  Целевое время: ${new Date(targetTime)}`);
-
-        showTimer();
-        startCountdown();
-    } catch (error) {
-        console.error('❌ Ошибка загрузки таймера:', error);
+    if (totalSeconds === 0) {
         showNoTimer();
+        return;
     }
+
+    targetTime = Date.now() + totalSeconds * 1000;
+
+    showTimer();
+    startCountdown();
 }
 
 function showTimer() {
@@ -149,9 +112,9 @@ function showNoTimer() {
 
 function startCountdown() {
     if (timerInterval) clearInterval(timerInterval);
-    
+
     updateDisplay();
-    timerInterval = setInterval(updateDisplay, 100);
+    timerInterval = setInterval(updateDisplay, 1000);
 }
 
 function stopCountdown() {
@@ -162,22 +125,26 @@ function stopCountdown() {
 }
 
 function updateDisplay() {
+
     if (!targetTime) return;
 
     const now = Date.now();
     const diff = targetTime - now;
 
     if (diff <= 0) {
+
         daysEl.textContent = '00';
         hoursEl.textContent = '00';
         minutesEl.textContent = '00';
         secondsEl.textContent = '00';
+
         stopCountdown();
         playFinishAnimation();
         return;
     }
 
     const totalSeconds = Math.floor(diff / 1000);
+
     const days = Math.floor(totalSeconds / 86400);
     const hours = Math.floor((totalSeconds % 86400) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -190,31 +157,37 @@ function updateDisplay() {
 }
 
 function playFinishAnimation() {
+
     timerBox.style.animation = 'none';
+
     setTimeout(() => {
         timerBox.style.animation = 'pulse 0.5s ease-in-out 3';
     }, 10);
 }
 
 function animateButton() {
+
     refreshBtn.style.opacity = '0.7';
+
     setTimeout(() => {
         refreshBtn.style.opacity = '1';
     }, 300);
 }
 
-// CSS анимации
+// ===== CSS АНИМАЦИЯ =====
 const style = document.createElement('style');
+
 style.textContent = `
-    @keyframes pulse {
-        0%, 100% { 
-            transform: scale(1);
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
-        }
-        50% { 
-            transform: scale(1.05);
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.6);
-        }
+@keyframes pulse {
+    0%,100%{
+        transform:scale(1);
+        box-shadow:0 0 40px rgba(168,85,247,0.4);
     }
+    50%{
+        transform:scale(1.05);
+        box-shadow:0 0 60px rgba(0,255,255,0.6);
+    }
+}
 `;
+
 document.head.appendChild(style);
