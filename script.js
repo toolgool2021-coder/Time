@@ -1,5 +1,7 @@
 // ===== КОНФИГУРАЦИЯ =====
-const GIST_RAW_URL = 'https://gist.githubusercontent.com/toolgool2021-coder/ccec7ab757f8ca35a783465f9c31eb66/raw/4aeb74103442ee044755ff3add663587efb5e5cf/Time.txt';
+// Используем CORS прокси для доступа к Gist'у
+const GIST_URL = 'https://gist.githubusercontent.com/toolgool2021-coder/ccec7ab757f8ca35a783465f9c31eb66/raw/4aeb74103442ee044755ff3add663587efb5e5cf/Time.txt';
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 let timerInterval = null;
 let targetTime = null;
@@ -83,13 +85,25 @@ setInterval(loadTimer, 5000);
 
 async function loadTimer() {
     try {
-        const response = await fetch(GIST_RAW_URL);
-        const text = await response.text().then(t => t.trim());
+        console.log('🔄 Загружаю таймер...');
+        
+        // Используем CORS прокси
+        const proxyUrl = CORS_PROXY + encodeURIComponent(GIST_URL);
+        
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const text = await response.text();
+        console.log('📄 Содержимое Gist:', text);
 
         // Парсим формат [Day:Hour:Min:Sec]
         const match = text.match(/\[(\d+):(\d+):(\d+):(\d+)\]/);
         
         if (!match || !text) {
+            console.log('❌ Таймер не найден');
             showNoTimer();
             return;
         }
@@ -99,8 +113,11 @@ async function loadTimer() {
         const minutes = parseInt(match[3]);
         const seconds = parseInt(match[4]);
 
+        console.log(`✅ Найден таймер: ${days}д ${hours}ч ${minutes}м ${seconds}с`);
+
         // Проверяем, есть ли вообще время
         if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+            console.log('⏸️  Время = 0, показываю "нету таймеров"');
             showNoTimer();
             return;
         }
@@ -109,10 +126,12 @@ async function loadTimer() {
         const totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds;
         targetTime = Date.now() + totalSeconds * 1000;
 
+        console.log(`⏱️  Целевое время: ${new Date(targetTime)}`);
+
         showTimer();
         startCountdown();
     } catch (error) {
-        console.error('Ошибка загрузки таймера:', error);
+        console.error('❌ Ошибка загрузки таймера:', error);
         showNoTimer();
     }
 }
